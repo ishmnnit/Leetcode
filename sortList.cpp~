@@ -1,0 +1,52 @@
+#include<iostream>
+using namespace std;
+
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL){}
+};
+
+void sortedInsert(ListNode *&head,ListNode *temp){
+    if(head==NULL){
+        head=temp;
+    }
+
+    if(temp->val < head->val) {
+        temp->next=head;
+        head=temp;
+    }
+
+    ListNode *node=head->next;
+    ListNode *prev=head;
+    while(node!=temp){
+        if(temp->val < node->val){
+            prev->next=temp;
+            temp->next=node;
+        }
+        else{
+            prev=node;
+            node=node->next;
+        }
+    }
+}
+
+
+ListNode *sortList(ListNode *head) {
+
+    if(head==NULL || head->next==NULL)
+        return head;
+
+    ListNode *temp=head->next;
+    ListNode *prev=head;
+    while(temp!=NULL){
+        sortedInsert(head,temp);
+        temp=temp->next;
+    }
+
+    return head;                
+}
+
+int main(){
+}

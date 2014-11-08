@@ -1,0 +1,102 @@
+#include <iostream>
+#include <map>
+using namespace std;
+
+class LRUCache
+{
+    struct Node {
+        Node *next;
+        Node *prev;
+        int key,value;
+        Node(Node *p,Node *n,int k,int v):prev(p),next(n),key(k),value(v){};
+        Node(int k,int v):prev(NULL),next(NULL),key(k),value(v){};
+    };
+    public:
+        map<int,Node*> nodeMap;
+        int capcity;
+        Node *head;
+        Node *tail;
+
+        LRUCache(int capcity);
+        int get(int key);
+        void set(int key,int value);
+        void insertNode(Node*);
+        void removeNode(Node*);
+        void moveNode(Node*);
+};
+
+
+LRUCache::LRUCache(int capcity){
+    this->capcity=capcity;
+    nodeMap.clear();
+    head=NULL;
+    tail=NULL;
+}
+
+
+void LRUCache::insertNode(Node * node){
+    if(head==NULL){
+        head=node;
+        tail=node;
+    }
+    else{
+        tail->next=node;
+        node->prev=tail;
+        tail=node;
+    }
+}
+
+void LRUCache::removeNode(Node *node){
+    if(node == head ){
+        head=head->next;
+        if(head!=NULL)
+            head->prev=NULL;
+    }
+    else{
+            node->next->prev=node->prev;
+            node->prev->next=node->next;
+    }
+}
+
+void LRUCache::moveNode(Node *node){
+    if(tail==node)
+        return;
+    if(node==head){
+        node->next->prev=NULL;
+        head=node->next;
+    }
+    else{
+        node->prev->next=node->next;
+        node->next->prev=node->prev;
+    }
+    tail->next=node;
+    tail=node;
+}
+
+int LRUCache::get(int key){
+    if(nodeMap.find(key)==nodeMap.end())
+        return -1;
+    Node *temp= nodeMap[key];
+    moveNode(temp);
+    return nodeMap[key]->value;
+}
+
+void LRUCache::set(int key,int value){
+    if(nodeMap.find(key) != nodeMap.end()){
+        moveNode(nodeMap[key]);
+        nodeMap[key]->value=value;
+    }
+    else{
+        if(nodeMap.size()==capcity){
+            nodeMap.erase(head->key);
+            removeNode(head);
+        }
+        Node *node=new Node(key,value);
+        nodeMap[key]=node;
+        insertNode(node);
+    
+}
+
+
+int main(){
+}
